@@ -59,8 +59,6 @@ function getLatestRelease(accessToken) {
 }
 
 function setVersionOutput(json) {
-    console.log(json)
-    // const json = JSON.parse(body);
     const displayVersion = json['releases'][0]['displayVersion'];
     const buildVersion = json['releases'][0]['buildVersion'];
 
