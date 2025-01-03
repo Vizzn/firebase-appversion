@@ -67,7 +67,6 @@ function setVersionOutput(body) {
     const buildVersion = json['releases'][0]['buildVersion'];
 
     console.log(`Current version: ${displayVersion}+${buildVersion}`);
-
     core.setOutput('displayVersion', displayVersion);
     core.setOutput('buildVersion', buildVersion);
     core.setOutput('flutterVersionString', `${displayVersion}+${buildVersion}`);
@@ -79,6 +78,7 @@ function setVersionOutput(body) {
     core.setOutput('newDisplayVersion', newDisplayVersion);
     core.setOutput('newBuildVersion', newBuildVersion);
     core.setOutput('newFlutterVersionString', `${newDisplayVersion}+${newBuildVersion}`);
+    core.saveState('newFlutterVersionString2', `${newDisplayVersion}+${newBuildVersion}`);
 }
 
 function incrementVersion(displayVersion) {
