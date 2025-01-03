@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const fetch = require('node-fetch');
+const needle = require('needle');
 const { google } = require("googleapis");
 
 const scopes = [
@@ -43,28 +43,18 @@ function googleJwtClient() {
 function getLatestRelease(accessToken) {
     const url = `https://firebaseappdistribution.googleapis.com/v1/projects/${projectNumber}/apps/${appId}/releases?orderBy=createTime%20desc&pageSize=1`;
 
-    const options = {
-        url: url,
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    };
+    var options = {
+        'Authorization': `Bearer ${accessToken}`
+    }
 
-    fetch(url, {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
-    }).then(function (response) {
-        if (response.ok) {
-            setVersionOutput(response.text());
+    needle.get(url, options, function (error, resp, body) {
+        if (error) {
+            core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
         } else {
-            core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${response.body}`);
+            setVersionOutput(body);
         }
-
-    }, function (error) {
-        core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
-    })
+    });
 }
-
-
 
 function setVersionOutput(body) {
     const json = JSON.parse(body);
