@@ -54,7 +54,7 @@ function getLatestRelease(accessToken) {
         headers: { 'Authorization': `Bearer ${accessToken}` }
     }).then(function (response) {
         if (response.ok) {
-            setVersionOutput(response.body);
+            setVersionOutput(response.text());
         } else {
             core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${response.body}`);
         }
@@ -63,6 +63,8 @@ function getLatestRelease(accessToken) {
         core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
     })
 }
+
+
 
 function setVersionOutput(body) {
     const json = JSON.parse(body);
