@@ -1,0 +1,75 @@
+name: Build APK & Upload to Firebase
+
+on:
+  push:
+    branches:
+      - 'mybranch'
+  workflow_dispatch: 
+
+env:
+  FLUTTER_CHANNEL: 'stable' 
+  FLUTTER_VERSION: '3.24.3'
+  XCODE_VERSION: '15.3' 
+
+jobs:
+  setup-flutter:
+    name: Build APK & Upload to Firebase
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+
+      - name: Display Flutter Version
+        run: flutter --version
+
+      - name: Clean Flutter Project
+        run: flutter clean
+
+      - name: Get Flutter Dependencies
+        run: flutter pub get   
+
+      # - name: Setup Android SDK
+      #   uses: android-actions/setup-android@v3
+
+      # - name: install ninja
+      #   uses: seanmiddleditch/gha-setup-ninja@v4
+
+      - name: Get latest app version
+        id: version
+        uses: Vizzn/firebase-appversion@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          projectNumber: ${{secrets.FIREBASE_PROJECT_NUMBER}}
+          serviceAccount: ${{secrets.FIREBASE_SERVICE_KEY}}
+
+      - name: Extract build number
+        id: extract_build_number
+        run: |
+          version_string="${{ steps.version.outputs.newFlutterVersionString }}"
+          build_number=$(echo $version_string | cut -d '+' -f 2)
+          echo "Build number is $build_number"
+          echo "build_number=$build_number" >> $GITHUB_ENV
+
+      - name: Build APK
+        run: flutter build apk --flavor dev --build-number=${{ env.build_number }}
+
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{secrets.FIREBASE_SERVICE_KEY}}
+          groups: devs
+          file: build/app/outputs/flutter-apk/app-dev-release.apk
