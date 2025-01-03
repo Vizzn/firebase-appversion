@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const request = require('request');
+const fetch = require('node-fetch');
 const { google } = require("googleapis");
 
 const scopes = [
@@ -50,15 +50,18 @@ function getLatestRelease(accessToken) {
         }
     };
 
-    request(options, (error, res, body) => {
-        if (error) {
-            return core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
-        };
+    fetch(url, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+    }).then(function (response) {
+        if (response.ok) {
+            setVersionOutput(response.body);
+        } else {
+            core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${response.body}`);
+        }
 
-        if (!error && res.statusCode == 200) {
-            setVersionOutput(body);
-        };
-    });
+    }, function (error) {
+        core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
+    })
 }
 
 function setVersionOutput(body) {
