@@ -56,8 +56,8 @@ function getLatestRelease(accessToken) {
     });
 }
 
-function setVersionOutput(body) {
-    const json = JSON.parse(body);
+function setVersionOutput(json) {
+    // const json = JSON.parse(body);
     const displayVersion = json['releases'][0]['displayVersion'];
     const buildVersion = json['releases'][0]['buildVersion'];
 
