@@ -16,11 +16,9 @@ jobs:
 
     steps:
     
-    # Your Preparation steps
-    - name: Get app version
     - name: Get latest app version
       id: version
-      uses: Vizzn/firebase-appversion@v1
+      uses: Vizzn/firebase-appversion@v0.1
       with:
         appId: ${{secrets.FIREBASE_APP_ID}}
         projectNumber: ${{secrets.FIREBASE_PROJECT_NUMBER}}
