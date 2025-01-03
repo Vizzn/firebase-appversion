@@ -44,7 +44,9 @@ function getLatestRelease(accessToken) {
     const url = `https://firebaseappdistribution.googleapis.com/v1/projects/${projectNumber}/apps/${appId}/releases?orderBy=createTime%20desc&pageSize=1`;
 
     var options = {
-        'Authorization': `Bearer ${accessToken}`
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
     }
 
     needle.get(url, options, function (error, resp, body) {
