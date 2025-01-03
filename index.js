@@ -51,13 +51,13 @@ function getLatestRelease(accessToken) {
         if (error) {
             core.setFailed(`Something went wrong, make sure your service account has the "Firebase App Distribution Admin" role. ${error.message}`);
         } else {
-            console.log(json)
             setVersionOutput(body);
         }
     });
 }
 
 function setVersionOutput(json) {
+    console.log(json)
     // const json = JSON.parse(body);
     const displayVersion = json['releases'][0]['displayVersion'];
     const buildVersion = json['releases'][0]['buildVersion'];
